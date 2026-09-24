@@ -2,18 +2,97 @@
    OWASP API SECURITY TOP 10 VISUALISED — Interactive Script
    ============================================================ */
 
+// --- Jargon Glossary Data ---
+// Each entry's `match` strings are matched case-insensitively, whole-word,
+// wherever they appear in prose (code/terminal blocks are left untouched
+// so simulated attack output still reads like real output). Declared at
+// top level (not inside DOMContentLoaded) so glossary.html can render the
+// full reference list from this same array after loading this script.
+const GLOSSARY_TERMS = [
+  { match: ['SSRF', 'Server-Side Request Forgery', 'Server Side Request Forgery'], text: 'Server-Side Request Forgery — tricking a server into making a request to a URL the attacker chooses, reaching internal-only services (like cloud metadata endpoints) that trust requests coming from the server itself.' },
+  { match: ['BOLA', 'Broken Object Level Authorization'], text: "Broken Object Level Authorization — an endpoint takes a raw object ID (an order, a user, an invoice) from the request and serves or modifies that record without checking whether the requester actually owns or is allowed to touch it. The API world's name for what's classically called IDOR." },
+  { match: ['IDOR', 'Insecure Direct Object Reference'], text: 'Insecure Direct Object Reference — the older, more general name for BOLA: an object is referenced directly by its ID with no access check behind it.' },
+  { match: ['BFLA', 'Broken Function Level Authorization'], text: "Broken Function Level Authorization — a lower-privilege user can call an endpoint meant only for admins or a different role, because the check exists in the UI (which button is shown) but not in the API itself." },
+  { match: ['BOPLA', 'Broken Object Property Level Authorization'], text: "Broken Object Property Level Authorization — a request can read fields it shouldn't see (excessive data exposure) or write fields it shouldn't be able to set, like a user field or an internal flag (mass assignment). One root cause, two directions." },
+  { match: ['mass assignment', 'Mass Assignment'], text: "Mass Assignment — binding an entire incoming request body straight onto a database model or object, so any field the client includes — even ones the UI never exposes, like role or isAdmin — gets written." },
+  { match: ['CORS', 'Cross-Origin Resource Sharing'], text: "Cross-Origin Resource Sharing — a browser mechanism controlling which other websites may read a site's API responses. A wildcard (*) combined with credentials lets any website read authenticated responses." },
+  { match: ['CWE', 'CWEs', 'Common Weakness Enumeration'], text: "Common Weakness Enumeration — a community-maintained catalog of common software weakness types (e.g. 'improper input validation'), used to classify vulnerability categories." },
+  { match: ['CVE', 'CVEs', 'Common Vulnerabilities and Exposures'], text: 'Common Vulnerabilities and Exposures — a public, uniquely-numbered catalog entry (e.g. CVE-2016-3714) for a specific known vulnerability, used to reference it unambiguously across tools and reports.' },
+  { match: ['PII', 'Personally Identifiable Information'], text: 'Personally Identifiable Information — any data that can identify a specific person (name, SSN, email, etc.). Exposing it is what triggers most data-breach laws and fines.' },
+  { match: ['WAF', 'Web Application Firewall'], text: "Web Application Firewall — a filter in front of an API that blocks known attack patterns in incoming traffic. It's a safety net, not a substitute for fixing the underlying vulnerability — Capital One's WAF was itself the entry point in 2019." },
+  { match: ['GDPR', 'General Data Protection Regulation'], text: "General Data Protection Regulation — the EU's data-protection law, allowing fines of up to €20M or 4% of global revenue for mishandling personal data." },
+  { match: ['MFA', 'Multi-Factor Authentication'], text: "Multi-Factor Authentication — requiring more than just a password to log in (e.g. a code from an app or a hardware key), so a leaked password alone isn't enough to break in." },
+  { match: ['IAM', 'Identity and Access Management'], text: 'Identity and Access Management — the system of policies controlling who (or what service, or what API credential) is allowed to do what, used for permissions on cloud accounts and infrastructure.' },
+  { match: ['JWT', 'JSON Web Token'], text: 'JSON Web Token — a signed, self-contained token format commonly used to represent a logged-in session or an API credential. If the server fails to verify its signature properly, an attacker can forge one.' },
+  { match: ['OAuth'], text: 'An authorization framework letting a user grant a third-party app limited access to their account on another service, without handing over their password — the "Log in with Google/Facebook" flow.' },
+  { match: ['API gateway', 'API Gateway'], text: 'A single front door that routes, authenticates and rate-limits requests to a collection of backend APIs — the natural place to enforce consistent security controls across all of them.' },
+  { match: ['rate limiting', 'rate limit', 'rate-limited'], text: 'Capping how many requests a single client (by account, API key or IP) can make in a given time window, so no one client can exhaust shared resources or brute-force a value at machine speed.' },
+  { match: ['SSN', 'Social Security Number'], text: "Social Security Number — a US government-issued personal ID number. Combined with a name and email, it's one of the most valuable pieces of data for identity theft." },
+  { match: ['DTO', 'DTOs', 'Data Transfer Object'], text: 'Data Transfer Object — a small, purpose-built object carrying only the fields a client actually needs, instead of a raw database row that may include sensitive columns.' },
+  { match: ['UUIDs', 'UUID', 'Universally Unique Identifiers', 'Universally Unique Identifier'], text: 'Universally Unique Identifier — a long, effectively unpredictable ID (e.g. f47ac10b-58cc...), used instead of sequential numbers (1, 2, 3...) so IDs can’t be easily guessed or enumerated.' },
+  { match: ['GCP', 'Google Cloud Platform'], text: "Google Cloud Platform — Google's cloud computing platform, an alternative to AWS or Azure." },
+  { match: ['Amazon S3', 'S3', 'Simple Storage Service'], text: "Amazon S3 (Simple Storage Service) — AWS's object storage service, commonly used for backups, file uploads and static hosting. Misconfigured buckets are a frequent source of public data leaks." },
+  { match: ['Amazon Web Services', 'AWS'], text: 'Amazon Web Services — the cloud computing platform operated by Amazon, offering services like S3 (storage) and EC2 (compute), each reachable from a server\'s internal metadata endpoint.' },
+  { match: ['CI/CD', 'Continuous Integration/Continuous Deployment'], text: "Continuous Integration/Continuous Deployment — the automated pipeline that builds, tests and ships code changes. Because it has broad access to source and secrets, it's a high-value attack target." },
+  { match: ['DoS', 'Denial of Service'], text: 'Denial of Service — an attack (or bug) that makes a system unavailable to legitimate users, by overwhelming it with traffic, requests, or triggering a crash or resource exhaustion.' },
+  { match: ['OWASP', 'Open Web Application Security Project'], text: 'Open Web Application Security Project — a nonprofit foundation publishing free, community-driven resources on application security, including the API Security Top 10 list this site is based on.' },
+  { match: ['allowlist'], text: 'A list of explicitly permitted values (domains, IPs, hostnames) — everything not on the list is denied by default. The opposite of a blocklist, which tries to deny known-bad values instead.' },
+  { match: ['egress proxy'], text: 'A controlled gateway that all outbound (server-to-internet) requests must pass through, so they can be inspected, logged and restricted — a key defense against SSRF.' },
+  { match: ['DNS rebinding', 'anti-rebinding', 'rebinding'], text: "A technique where a domain's DNS record is changed after a security check passes, pointing it at an internal/private IP so a later request reaches an internal service unexpectedly." },
+  { match: ['enumeration', 'enumerate'], text: 'Systematically trying many possible values (IDs, usernames, order numbers) against a target to see which ones exist or return data — often scripted, as with sequential ID enumeration.' },
+  { match: ['brute-force'], text: 'Repeatedly guessing credentials (passwords, tokens, OTP codes) by trying many possibilities in sequence until one works, rather than exploiting a specific flaw.' },
+  { match: ['credential stuffing'], text: "Trying username/password pairs leaked from one breach against a completely different site, betting that people reuse passwords. Works purely on scale — no exploit needed." },
+  { match: ['OpenAPI', 'Swagger'], text: 'A machine-readable specification format (OpenAPI, formerly called Swagger) describing every endpoint, parameter and response an API exposes — useful for developers, and just as useful for an attacker if left publicly reachable.' },
+  { match: ['shadow API', 'zombie API'], text: 'A shadow API is one that exists and runs in production without being tracked in the official inventory (often spun up for a quick integration). A zombie API is an old, supposedly-retired version still reachable and often missing later security fixes.' },
+  { match: ['deserialization'], text: 'Converting stored or transmitted data back into a live object in memory. Doing this on untrusted input — including a response from a third-party API — can let an attacker construct objects that execute code.' },
+  { match: ['reverse proxy'], text: "A server that sits in front of one or more backend servers and forwards client requests to them, often adding caching, load balancing or TLS termination along the way." },
+  { match: ['software supply chain', 'supply chain'], text: 'The full chain of vendors, tools and dependencies that produced a piece of software before it reached you — compromising any link (a build server, a signing key, a vendor\'s own vendor) can compromise everything downstream.' },
+  { match: ['schema validation', 'JSON Schema'], text: "Checking incoming (or, just as importantly, incoming-from-a-partner) data against a strict, predefined structure — expected fields, types, formats — before trusting or storing any of it." }
+];
+
 document.addEventListener('DOMContentLoaded', () => {
 
-  // --- Disclosure Banner ---
-  window.dismissBanner = () => {
-    const banner = document.getElementById('disclosureBanner');
-    banner.classList.add('dismissed');
-    localStorage.setItem('owasp-api-disclosure-dismissed', 'true');
-  };
+  // --- Disclosure Modal ---
+  // A true modal (backdrop + centered card), dismissible via the button,
+  // Escape, or a backdrop click — persisted so it only ever shows once per
+  // browser. Unlike a persistent banner it can't be left open indefinitely,
+  // and while open it locks body scroll and traps Tab on its one control.
+  (function initDisclosureModal() {
+    const modal = document.getElementById('disclosureBanner');
+    if (!modal) return;
+    const STORAGE_KEY = 'owasp-api-disclosure-dismissed';
+    const dismissBtn = modal.querySelector('.disclosure-dismiss');
 
-  if (localStorage.getItem('owasp-api-disclosure-dismissed') === 'true') {
-    document.getElementById('disclosureBanner').classList.add('dismissed');
-  }
+    window.dismissBanner = () => {
+      modal.classList.add('dismissed');
+      document.body.style.overflow = '';
+      localStorage.setItem(STORAGE_KEY, 'true');
+    };
+
+    if (localStorage.getItem(STORAGE_KEY) === 'true') {
+      modal.classList.add('dismissed');
+      return;
+    }
+
+    document.body.style.overflow = 'hidden';
+    if (dismissBtn) dismissBtn.focus();
+
+    modal.addEventListener('click', (e) => {
+      if (e.target === modal) window.dismissBanner();
+    });
+
+    document.addEventListener('keydown', (e) => {
+      if (modal.classList.contains('dismissed')) return;
+      if (e.key === 'Escape') {
+        window.dismissBanner();
+      } else if (e.key === 'Tab') {
+        // Only one focusable control exists in the modal — keep focus
+        // pinned there instead of letting Tab reach the page behind it.
+        e.preventDefault();
+        if (dismissBtn) dismissBtn.focus();
+      }
+    });
+  })();
 
   // --- Theme Toggle (auto / light / dark) ---
   (function initThemeToggle() {
@@ -309,51 +388,8 @@ document.addEventListener('DOMContentLoaded', () => {
   })();
 
   // --- Jargon Glossary ---
-  // Each entry's `match` strings are matched case-insensitively, whole-word,
-  // wherever they appear in prose (code/terminal blocks are left untouched
-  // so simulated attack output still reads like real output).
-  const GLOSSARY_TERMS = [
-    { match: ['SSRF', 'Server-Side Request Forgery', 'Server Side Request Forgery'], text: 'Server-Side Request Forgery — tricking a server into making a request to a URL the attacker chooses, reaching internal-only services (like cloud metadata endpoints) that trust requests coming from the server itself.' },
-    { match: ['BOLA', 'Broken Object Level Authorization'], text: "Broken Object Level Authorization — an endpoint takes a raw object ID (an order, a user, an invoice) from the request and serves or modifies that record without checking whether the requester actually owns or is allowed to touch it. The API world's name for what's classically called IDOR." },
-    { match: ['IDOR', 'Insecure Direct Object Reference'], text: 'Insecure Direct Object Reference — the older, more general name for BOLA: an object is referenced directly by its ID with no access check behind it.' },
-    { match: ['BFLA', 'Broken Function Level Authorization'], text: "Broken Function Level Authorization — a lower-privilege user can call an endpoint meant only for admins or a different role, because the check exists in the UI (which button is shown) but not in the API itself." },
-    { match: ['BOPLA', 'Broken Object Property Level Authorization'], text: "Broken Object Property Level Authorization — a request can read fields it shouldn't see (excessive data exposure) or write fields it shouldn't be able to set, like a user field or an internal flag (mass assignment). One root cause, two directions." },
-    { match: ['mass assignment', 'Mass Assignment'], text: "Mass Assignment — binding an entire incoming request body straight onto a database model or object, so any field the client includes — even ones the UI never exposes, like role or isAdmin — gets written." },
-    { match: ['CORS', 'Cross-Origin Resource Sharing'], text: "Cross-Origin Resource Sharing — a browser mechanism controlling which other websites may read a site's API responses. A wildcard (*) combined with credentials lets any website read authenticated responses." },
-    { match: ['CWE', 'CWEs', 'Common Weakness Enumeration'], text: "Common Weakness Enumeration — a community-maintained catalog of common software weakness types (e.g. 'improper input validation'), used to classify vulnerability categories." },
-    { match: ['CVE', 'CVEs', 'Common Vulnerabilities and Exposures'], text: 'Common Vulnerabilities and Exposures — a public, uniquely-numbered catalog entry (e.g. CVE-2016-3714) for a specific known vulnerability, used to reference it unambiguously across tools and reports.' },
-    { match: ['PII', 'Personally Identifiable Information'], text: 'Personally Identifiable Information — any data that can identify a specific person (name, SSN, email, etc.). Exposing it is what triggers most data-breach laws and fines.' },
-    { match: ['WAF', 'Web Application Firewall'], text: "Web Application Firewall — a filter in front of an API that blocks known attack patterns in incoming traffic. It's a safety net, not a substitute for fixing the underlying vulnerability — Capital One's WAF was itself the entry point in 2019." },
-    { match: ['GDPR', 'General Data Protection Regulation'], text: "General Data Protection Regulation — the EU's data-protection law, allowing fines of up to €20M or 4% of global revenue for mishandling personal data." },
-    { match: ['MFA', 'Multi-Factor Authentication'], text: "Multi-Factor Authentication — requiring more than just a password to log in (e.g. a code from an app or a hardware key), so a leaked password alone isn't enough to break in." },
-    { match: ['IAM', 'Identity and Access Management'], text: 'Identity and Access Management — the system of policies controlling who (or what service, or what API credential) is allowed to do what, used for permissions on cloud accounts and infrastructure.' },
-    { match: ['JWT', 'JSON Web Token'], text: 'JSON Web Token — a signed, self-contained token format commonly used to represent a logged-in session or an API credential. If the server fails to verify its signature properly, an attacker can forge one.' },
-    { match: ['OAuth'], text: 'An authorization framework letting a user grant a third-party app limited access to their account on another service, without handing over their password — the "Log in with Google/Facebook" flow.' },
-    { match: ['API gateway', 'API Gateway'], text: 'A single front door that routes, authenticates and rate-limits requests to a collection of backend APIs — the natural place to enforce consistent security controls across all of them.' },
-    { match: ['rate limiting', 'rate limit', 'rate-limited'], text: 'Capping how many requests a single client (by account, API key or IP) can make in a given time window, so no one client can exhaust shared resources or brute-force a value at machine speed.' },
-    { match: ['SSN', 'Social Security Number'], text: "Social Security Number — a US government-issued personal ID number. Combined with a name and email, it's one of the most valuable pieces of data for identity theft." },
-    { match: ['DTO', 'DTOs', 'Data Transfer Object'], text: 'Data Transfer Object — a small, purpose-built object carrying only the fields a client actually needs, instead of a raw database row that may include sensitive columns.' },
-    { match: ['UUIDs', 'UUID', 'Universally Unique Identifiers', 'Universally Unique Identifier'], text: 'Universally Unique Identifier — a long, effectively unpredictable ID (e.g. f47ac10b-58cc...), used instead of sequential numbers (1, 2, 3...) so IDs can’t be easily guessed or enumerated.' },
-    { match: ['GCP', 'Google Cloud Platform'], text: "Google Cloud Platform — Google's cloud computing platform, an alternative to AWS or Azure." },
-    { match: ['Amazon S3', 'S3', 'Simple Storage Service'], text: "Amazon S3 (Simple Storage Service) — AWS's object storage service, commonly used for backups, file uploads and static hosting. Misconfigured buckets are a frequent source of public data leaks." },
-    { match: ['Amazon Web Services', 'AWS'], text: 'Amazon Web Services — the cloud computing platform operated by Amazon, offering services like S3 (storage) and EC2 (compute), each reachable from a server\'s internal metadata endpoint.' },
-    { match: ['CI/CD', 'Continuous Integration/Continuous Deployment'], text: "Continuous Integration/Continuous Deployment — the automated pipeline that builds, tests and ships code changes. Because it has broad access to source and secrets, it's a high-value attack target." },
-    { match: ['DoS', 'Denial of Service'], text: 'Denial of Service — an attack (or bug) that makes a system unavailable to legitimate users, by overwhelming it with traffic, requests, or triggering a crash or resource exhaustion.' },
-    { match: ['OWASP', 'Open Web Application Security Project'], text: 'Open Web Application Security Project — a nonprofit foundation publishing free, community-driven resources on application security, including the API Security Top 10 list this site is based on.' },
-    { match: ['allowlist'], text: 'A list of explicitly permitted values (domains, IPs, hostnames) — everything not on the list is denied by default. The opposite of a blocklist, which tries to deny known-bad values instead.' },
-    { match: ['egress proxy'], text: 'A controlled gateway that all outbound (server-to-internet) requests must pass through, so they can be inspected, logged and restricted — a key defense against SSRF.' },
-    { match: ['DNS rebinding', 'anti-rebinding', 'rebinding'], text: "A technique where a domain's DNS record is changed after a security check passes, pointing it at an internal/private IP so a later request reaches an internal service unexpectedly." },
-    { match: ['enumeration', 'enumerate'], text: 'Systematically trying many possible values (IDs, usernames, order numbers) against a target to see which ones exist or return data — often scripted, as with sequential ID enumeration.' },
-    { match: ['brute-force'], text: 'Repeatedly guessing credentials (passwords, tokens, OTP codes) by trying many possibilities in sequence until one works, rather than exploiting a specific flaw.' },
-    { match: ['credential stuffing'], text: "Trying username/password pairs leaked from one breach against a completely different site, betting that people reuse passwords. Works purely on scale — no exploit needed." },
-    { match: ['OpenAPI', 'Swagger'], text: 'A machine-readable specification format (OpenAPI, formerly called Swagger) describing every endpoint, parameter and response an API exposes — useful for developers, and just as useful for an attacker if left publicly reachable.' },
-    { match: ['shadow API', 'zombie API'], text: 'A shadow API is one that exists and runs in production without being tracked in the official inventory (often spun up for a quick integration). A zombie API is an old, supposedly-retired version still reachable and often missing later security fixes.' },
-    { match: ['deserialization'], text: 'Converting stored or transmitted data back into a live object in memory. Doing this on untrusted input — including a response from a third-party API — can let an attacker construct objects that execute code.' },
-    { match: ['reverse proxy'], text: "A server that sits in front of one or more backend servers and forwards client requests to them, often adding caching, load balancing or TLS termination along the way." },
-    { match: ['software supply chain', 'supply chain'], text: 'The full chain of vendors, tools and dependencies that produced a piece of software before it reached you — compromising any link (a build server, a signing key, a vendor\'s own vendor) can compromise everything downstream.' },
-    { match: ['schema validation', 'JSON Schema'], text: "Checking incoming (or, just as importantly, incoming-from-a-partner) data against a strict, predefined structure — expected fields, types, formats — before trusting or storing any of it." }
-  ];
-
+  // GLOSSARY_TERMS itself is declared at the top of this file (outside this
+  // handler) so glossary.html can reuse it after loading this same script.
   (function initGlossary() {
     const escapeRegex = (s) => s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
 
@@ -373,7 +409,7 @@ document.addEventListener('DOMContentLoaded', () => {
     // matching literal syntax (e.g. JSON field names) instead of prose.
     const skipTags = new Set(['SCRIPT', 'STYLE', 'CODE', 'PRE', 'BUTTON', 'A']);
     const skipSelector = '.site-header, .disclosure-banner, .vuln-nav, .site-footer, ' +
-      '.code-header, .mock-devtools, .mock-browser, .db-header, .code-badge-fixed, .pipeline-diagram, .dep-node';
+      '.code-header, .mock-devtools, .mock-browser, .db-header, .code-badge-fixed, .pipeline-diagram, .dep-node, .glossary-term';
 
     const walker = document.createTreeWalker(document.body, NodeFilter.SHOW_TEXT, {
       acceptNode(node) {

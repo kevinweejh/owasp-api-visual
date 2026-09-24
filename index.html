@@ -4,11 +4,41 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>OWASP API Security Top 10 (2023) — Visualised</title>
+    <meta name="description"
+      content="An interactive, static site showing what OWASP API Security Top 10 (2023) vulnerabilities actually look like — from the request to the attacker's terminal. No setup required.">
+    <meta name="theme-color" content="#0f1617"
+      media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fcfc"
+      media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title"
+      content="OWASP API Security Top 10 (2023) — Visualised">
+    <meta property="og:description"
+      content="An interactive, static site showing what OWASP API Security Top 10 (2023) vulnerabilities actually look like — from the request to the attacker's terminal. No setup required.">
+    <meta property="og:image" content="og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name"
+      content="OWASP API Security Top 10 — Visualised">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+      content="OWASP API Security Top 10 (2023) — Visualised">
+    <meta name="twitter:description"
+      content="An interactive, static site showing what OWASP API Security Top 10 (2023) vulnerabilities actually look like — from the request to the attacker's terminal.">
+    <meta name="twitter:image" content="og-image.png">
+
     <script>
     (function () {
       var stored = localStorage.getItem('owasp-api-theme');
       if (stored === 'light' || stored === 'dark') {
         document.documentElement.setAttribute('data-theme', stored);
+      }
+      if (localStorage.getItem('owasp-api-disclosure-dismissed') === 'true') {
+        document.documentElement.setAttribute('data-disclosure-dismissed', '');
       }
     })();
   </script>
@@ -177,22 +207,27 @@
             d="M20 14.5a8.5 8.5 0 1 1-9-13.4 9 9 0 0 0 9 13.4z" /></symbol></defs></svg>
     <a href="#main-content" class="skip-link">Skip to main content</a>
 
-    <!-- RESPONSIBLE DISCLOSURE BANNER -->
-    <div class="disclosure-banner" id="disclosureBanner">
-      <div class="disclosure-content">
-        <div class="disclosure-icon"><svg class="icon" aria-hidden="true"
-            focusable="false"><use href="#icon-warning"></use></svg></div>
-        <div class="disclosure-text">
-          <strong>Educational Resource — Responsible Use Only</strong>
-          <p>This site demonstrates common API vulnerabilities using
-            <em>simulated, static examples</em>. No real systems are harmed or
-            targeted. The techniques shown here are for <strong>defensive
-              understanding only</strong> — to help developers recognise,
-            prevent and fix these issues in their own APIs. Unauthorised testing
-            of systems you don't own is&nbsp;illegal.</p>
+    <!-- RESPONSIBLE DISCLOSURE MODAL -->
+    <div class="disclosure-banner" id="disclosureBanner" role="dialog"
+      aria-modal="true" aria-labelledby="disclosureTitle"
+      aria-describedby="disclosureDesc">
+      <div class="disclosure-modal">
+        <div class="disclosure-content">
+          <div class="disclosure-icon"><svg class="icon" aria-hidden="true"
+              focusable="false"><use href="#icon-warning"></use></svg></div>
+          <div class="disclosure-text">
+            <strong id="disclosureTitle">Educational Resource — Responsible Use
+              Only</strong>
+            <p id="disclosureDesc">This site demonstrates common API
+              vulnerabilities using <em>simulated, static examples</em>. No real
+              systems are harmed or targeted. The techniques shown here are for
+              <strong>defensive understanding only</strong> — to help developers
+              recognise, prevent and fix these issues in their own APIs.
+              Unauthorised testing of systems you don't own is&nbsp;illegal.</p>
+          </div>
+          <button class="disclosure-dismiss"
+            onclick="dismissBanner()">Understood</button>
         </div>
-        <button class="disclosure-dismiss"
-          onclick="dismissBanner()">Understood</button>
       </div>
     </div>
 
@@ -6127,6 +6162,8 @@ async function getRateQuote(order) {
               target="_blank" rel="noopener">OWASP API Security Top 10
               (2023)</a> by the OWASP&nbsp;Foundation.</p>
           <p>Built for educational purposes. Not affiliated with&nbsp;OWASP.</p>
+          <p><a href="glossary.html">Glossary of terms used on this site</a> —
+            also printable to&nbsp;PDF.</p>
         </div>
       </div>
     </footer>

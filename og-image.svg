@@ -1,0 +1,15 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <rect width="1200" height="630" fill="#0f1617"/>
+  <circle cx="205" cy="315" r="290" fill="#0e8478" fill-opacity="0.10"/>
+  <circle cx="205" cy="315" r="180" fill="#0e8478" fill-opacity="0.14"/>
+
+  <!-- Shield icon (filled), scaled up from the site's icon-shield path, viewBox 24 -> scale 9.5 -->
+  <g transform="translate(205,315) scale(9.5) translate(-12,-12)">
+    <path d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z" fill="#0e8478"/>
+  </g>
+
+  <text x="430" y="235" font-family="Arial, Helvetica, sans-serif" font-size="22" font-weight="700" letter-spacing="1.5" fill="#2dd4bf">API SECURITY TOP 10 · 2023</text>
+  <text x="428" y="330" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" fill="#e8eff0">API Security</text>
+  <text x="428" y="415" font-family="Arial, Helvetica, sans-serif" font-size="76" font-weight="700" fill="#2dd4bf">Visualised</text>
+  <text x="430" y="470" font-family="Arial, Helvetica, sans-serif" font-size="26" fill="#8ba5a8">See what API vulnerabilities actually look like.</text>
+</svg>

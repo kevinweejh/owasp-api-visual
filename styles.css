@@ -4,9 +4,6 @@
 
 /* --- VARIABLES & RESET --- */
 :root {
-  /* Teal/cyan brand hue (H~186 neutrals, H~172 accent) — deliberately shifted
-     from the sibling web Top 10 project's indigo/violet (H~225/243) so the
-     two sites stay visually distinguishable while sharing the same structure. */
   --bg: #0f1617;
   --bg-card: #1a2627;
   --bg-elevated: #223739;
@@ -108,43 +105,58 @@ body {
   top: 8px;
 }
 
-/* --- DISCLOSURE BANNER --- */
+/* --- DISCLOSURE MODAL --- */
+html[data-disclosure-dismissed] .disclosure-banner { display: none; }
+
 .disclosure-banner {
-  position: sticky;
-  top: 0;
-  z-index: 1000;
-  background: var(--warning-bg);
-  border-bottom: 1px solid var(--warning);
-  padding: 12px 20px;
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
 }
 
 .disclosure-banner.dismissed { display: none; }
 
+.disclosure-modal {
+  background: var(--bg-card);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.45);
+  max-width: 440px;
+  width: 100%;
+  max-height: calc(100vh - 40px);
+  overflow-y: auto;
+  padding: 28px 24px 24px;
+  text-align: center;
+}
+
 .disclosure-content {
-  max-width: var(--max-width);
-  margin: 0 auto;
   display: flex;
-  align-items: flex-start;
+  flex-direction: column;
+  align-items: center;
   gap: 12px;
 }
 
-.disclosure-icon { font-size: 24px; flex-shrink: 0; margin-top: 2px; }
+.disclosure-icon { font-size: 28px; }
 
-.disclosure-text { flex: 1; }
-.disclosure-text strong { color: var(--warning); font-size: 14px; }
-.disclosure-text p { font-size: 12px; color: var(--text-muted); margin: 0; line-height: 1.5; }
+.disclosure-text strong { display: block; color: var(--warning); font-size: 15px; margin-bottom: 6px; }
+.disclosure-text p { font-size: 13px; color: var(--text-muted); margin: 0; line-height: 1.6; }
 
 .disclosure-dismiss {
   background: var(--warning);
   color: #000;
   border: none;
-  padding: 8px 16px;
+  padding: 10px 24px;
   border-radius: var(--radius-sm);
   font-weight: 600;
   font-size: 13px;
   cursor: pointer;
-  flex-shrink: 0;
   transition: var(--transition);
+  margin-top: 4px;
 }
 .disclosure-dismiss:hover { opacity: 0.8; }
 
@@ -1083,14 +1095,74 @@ body {
   .stuffing-diagram { flex-direction: column; }
   .stuff-arrow { transform: rotate(90deg); }
   .network-row { grid-template-columns: 1fr 50px 50px 50px; font-size: 11px; }
-  .disclosure-content { flex-direction: column; }
 }
 
-/* --- SCROLL FOCUS FADE ---
-   Desktop-only visual aid: dims content the user has scrolled away from
-   (or hasn't reached yet) so the current section reads as the focal point.
-   Applied via JS (script.js) setting inline opacity + a shared transition;
-   gated the same way there (min-width, prefers-reduced-motion). */
+/* --- SCROLL FOCUS FADE --- */
 .scroll-fade {
   transition: opacity 0.2s linear;
+}
+
+/* --- GLOSSARY PAGE --- */
+.glossary-header { padding: 40px 20px 24px; text-align: center; border-bottom: 1px solid var(--border); }
+.glossary-header h2 { font-size: 28px; margin-bottom: 8px; }
+.glossary-intro { color: var(--text-muted); font-size: 14px; max-width: 600px; margin: 0 auto; }
+.glossary-back { display: inline-flex; align-items: center; gap: 6px; margin-top: 16px; font-size: 13px; color: var(--accent-text); text-decoration: none; }
+.glossary-back:hover { text-decoration: underline; }
+
+.glossary-toolbar {
+  max-width: var(--max-width);
+  margin: 24px auto 0;
+  padding: 0 20px;
+  display: flex;
+  gap: 12px;
+  align-items: center;
+  flex-wrap: wrap;
+}
+.glossary-filter {
+  flex: 1;
+  min-width: 200px;
+  padding: 10px 14px;
+  border-radius: var(--radius-sm);
+  border: 1px solid var(--border);
+  background: var(--bg-card);
+  color: var(--text);
+  font-size: 14px;
+}
+.glossary-filter:focus { outline: none; border-color: var(--accent); }
+.glossary-download { display: inline-flex; align-items: center; gap: 6px; white-space: nowrap; flex-shrink: 0; }
+.glossary-count { font-size: 12px; color: var(--text-muted); white-space: nowrap; }
+
+.glossary-list {
+  max-width: var(--max-width);
+  margin: 8px auto 60px;
+  padding: 0 20px;
+}
+.glossary-entry {
+  padding: 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+.glossary-entry.term-hidden { display: none; }
+.glossary-term {
+  font-family: var(--font-mono);
+  font-weight: 700;
+  font-size: 15px;
+  color: var(--accent-text);
+  scroll-margin-top: calc(var(--nav-offset, 0px) + 20px);
+}
+.glossary-aliases { font-family: var(--font-sans); font-weight: 400; font-size: 12px; color: var(--text-muted); }
+.glossary-definition { margin: 6px 0 0; font-size: 14px; color: var(--text); line-height: 1.6; }
+.glossary-empty { text-align: center; color: var(--text-muted); font-size: 14px; padding: 40px 20px; }
+
+/* --- GLOSSARY PRINT (browser "Print to PDF" gives a clean reference sheet) --- */
+@media print {
+  .disclosure-banner, .theme-toggle, .vuln-nav, .site-footer, .glossary-toolbar, .glossary-back, .skip-link {
+    display: none !important;
+  }
+  .glossary-entry.term-hidden { display: block !important; }
+  body { background: #fff !important; color: #000 !important; }
+  .glossary-header { border-bottom-color: #ccc; }
+  .glossary-term { color: #000 !important; }
+  .glossary-definition, .glossary-aliases, .glossary-intro, .glossary-count { color: #333 !important; }
+  .glossary-entry { break-inside: avoid; border-bottom-color: #ddd; }
+  .glossary-list a { color: #000 !important; text-decoration: underline; }
 }

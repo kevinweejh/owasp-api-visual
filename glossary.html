@@ -1,0 +1,200 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Glossary — OWASP API Security Top 10 (2023) Visualised</title>
+    <meta name="description"
+      content="Every acronym and piece of jargon used across OWASP API Security Top 10 (2023) — Visualised, defined in one place. Filterable, and printable to PDF.">
+    <meta name="theme-color" content="#0f1617"
+      media="(prefers-color-scheme: dark)">
+    <meta name="theme-color" content="#f8fcfc"
+      media="(prefers-color-scheme: light)">
+    <link rel="icon" type="image/svg+xml" href="favicon.svg">
+    <link rel="apple-touch-icon" href="apple-touch-icon.png">
+
+    <meta property="og:type" content="website">
+    <meta property="og:title"
+      content="Glossary — OWASP API Security Top 10 (2023) Visualised">
+    <meta property="og:description"
+      content="Every acronym and piece of jargon used across OWASP API Security Top 10 (2023) — Visualised, defined in one place. Filterable, and printable to PDF.">
+    <meta property="og:image" content="og-image.png">
+    <meta property="og:image:width" content="1200">
+    <meta property="og:image:height" content="630">
+    <meta property="og:site_name"
+      content="OWASP API Security Top 10 — Visualised">
+    <meta property="og:locale" content="en_US">
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title"
+      content="Glossary — OWASP API Security Top 10 (2023) Visualised">
+    <meta name="twitter:description"
+      content="Every acronym and piece of jargon used across OWASP API Security Top 10 (2023) — Visualised, defined in one place.">
+    <meta name="twitter:image" content="og-image.png">
+
+    <script>
+    (function () {
+      var stored = localStorage.getItem('owasp-api-theme');
+      if (stored === 'light' || stored === 'dark') {
+        document.documentElement.setAttribute('data-theme', stored);
+      }
+    })();
+  </script>
+    <link rel="stylesheet" href="styles.css">
+  </head>
+  <body>
+    <svg style="display:none" aria-hidden="true"><defs><symbol id="icon-warning"
+          viewBox="0 0 24 24"><path d="M12 3 2 20h20L12 3z" /><line x1="12"
+            y1="9" x2="12" y2="13.5" /><line x1="12" y1="16.5" x2="12"
+            y2="16.6" /></symbol><symbol id="icon-desktop"
+          viewBox="0 0 24 24"><rect x="3" y="4" width="18" height="12"
+            rx="1.5" /><line x1="8" y1="20" x2="16" y2="20" /><line x1="12"
+            y1="16" x2="12" y2="20" /></symbol><symbol id="icon-shield"
+          viewBox="0 0 24 24"><path
+            d="M12 3l7 3v6c0 5-3.5 7.5-7 9-3.5-1.5-7-4-7-9V6l7-3z" /></symbol><symbol
+          id="icon-book" viewBox="0 0 24 24"><path
+            d="M4 5c2-1 5-1 8 1 3-2 6-2 8-1v13c-2-1-5-1-8 1-3-2-6-2-8-1V5z" /><line
+            x1="12" y1="6" x2="12" y2="19" /></symbol><symbol id="icon-document"
+          viewBox="0 0 24 24"><path d="M6 2h9l3 3v17H6z" /><path
+            d="M15 2v3h3" /><line x1="9" y1="12" x2="15" y2="12" /><line x1="9"
+            y1="16" x2="15" y2="16" /></symbol><symbol id="icon-sun"
+          viewBox="0 0 24 24"><circle cx="12" cy="12" r="4.5" /><line x1="12"
+            y1="2" x2="12" y2="4.5" /><line x1="12" y1="19.5" x2="12"
+            y2="22" /><line x1="2" y1="12" x2="4.5" y2="12" /><line x1="19.5"
+            y1="12" x2="22" y2="12" /><line x1="4.5" y1="4.5" x2="6.5"
+            y2="6.5" /><line x1="17.5" y1="17.5" x2="19.5" y2="19.5" /><line
+            x1="4.5" y1="19.5" x2="6.5" y2="17.5" /><line x1="17.5" y1="6.5"
+            x2="19.5" y2="4.5" /></symbol><symbol id="icon-moon"
+          viewBox="0 0 24 24"><path
+            d="M20 14.5a8.5 8.5 0 1 1-9-13.4 9 9 0 0 0 9 13.4z" /></symbol></defs></svg>
+    <a href="#main-content" class="skip-link">Skip to main content</a>
+
+    <!-- HEADER -->
+    <header class="site-header">
+      <button class="theme-toggle" id="themeToggle" type="button"
+        aria-label="Theme: Auto">
+        <span class="theme-toggle-icon" aria-hidden="true"><svg class="icon"
+            aria-hidden="true" focusable="false"><use
+              href="#icon-desktop"></use></svg></span>
+      </button>
+      <div class="header-inner">
+        <h1 class="site-title"><svg class="icon" aria-hidden="true"
+            focusable="false"><use href="#icon-book"></use></svg> Glossary <span
+            class="title-accent">Reference</span></h1>
+        <p class="site-subtitle">Every acronym and piece of jargon used across
+          OWASP API Security Top 10 (2023) — Visualised, defined in
+          one&nbsp;place.</p>
+        <a class="glossary-back" href="index.html">← Back to OWASP API Security
+          Top 10 (2023) — Visualised</a>
+      </div>
+    </header>
+
+    <!-- MAIN CONTENT -->
+    <main class="main-content" id="main-content">
+      <div class="glossary-toolbar">
+        <input type="search" class="glossary-filter" id="glossaryFilter"
+          placeholder="Filter terms… (e.g. BOLA, CORS, JWT)"
+          aria-label="Filter glossary terms">
+        <button type="button" class="step-btn glossary-download"
+          onclick="window.print()">
+          <svg class="icon" aria-hidden="true" focusable="false"><use
+              href="#icon-document"></use></svg> Download as PDF
+        </button>
+        <span class="glossary-count" id="glossaryCount"
+          aria-live="polite"></span>
+      </div>
+      <dl class="glossary-list" id="glossaryList"></dl>
+    </main>
+
+    <!-- FOOTER -->
+    <footer class="site-footer">
+      <div class="footer-inner">
+        <div class="footer-disclaimer">
+          <strong><svg class="icon" aria-hidden="true" focusable="false"><use
+                href="#icon-warning"></use></svg> Disclaimer:</strong> This is
+          an educational resource. All demonstrations use simulated, static
+          examples. No real systems are targeted or harmed. The techniques shown
+          are for defensive understanding only. Unauthorised access to computer
+          systems is illegal under the Computer Fraud and Abuse Act (US),
+          Computer Misuse Act (UK) and equivalent laws worldwide.
+        </div>
+        <div class="footer-credits">
+          <p>Based on the <a
+              href="https://owasp.org/projects/api-security-project"
+              target="_blank" rel="noopener">OWASP API Security Top 10
+              (2023)</a> by the OWASP&nbsp;Foundation.</p>
+          <p>Built for educational purposes. Not affiliated with&nbsp;OWASP.</p>
+        </div>
+      </div>
+    </footer>
+
+    <script src="script.js"></script>
+    <script>
+    (function renderGlossaryPage() {
+      var list = document.getElementById('glossaryList');
+      var filterInput = document.getElementById('glossaryFilter');
+      var countEl = document.getElementById('glossaryCount');
+      if (!list || typeof GLOSSARY_TERMS === 'undefined') return;
+
+      function slugify(s) {
+        return s.toLowerCase().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '');
+      }
+
+      var sorted = GLOSSARY_TERMS.slice().sort(function (a, b) {
+        return a.match[0].localeCompare(b.match[0], undefined, { sensitivity: 'base' });
+      });
+
+      var entries = sorted.map(function (entry) {
+        var primary = entry.match[0];
+        var aliases = entry.match.slice(1).filter(function (m) {
+          return m.toLowerCase() !== primary.toLowerCase();
+        });
+
+        var wrapper = document.createElement('div');
+        wrapper.className = 'glossary-entry';
+
+        var dt = document.createElement('dt');
+        dt.className = 'glossary-term';
+        dt.id = 'term-' + slugify(primary);
+        dt.textContent = primary;
+        if (aliases.length) {
+          var aka = document.createElement('span');
+          aka.className = 'glossary-aliases';
+          aka.textContent = ' (' + aliases.join(', ') + ')';
+          dt.appendChild(aka);
+        }
+
+        var dd = document.createElement('dd');
+        dd.className = 'glossary-definition';
+        dd.textContent = entry.text;
+
+        wrapper.appendChild(dt);
+        wrapper.appendChild(dd);
+        list.appendChild(wrapper);
+
+        return { el: wrapper, searchable: (primary + ' ' + aliases.join(' ') + ' ' + entry.text).toLowerCase() };
+      });
+
+      function updateCount(visible) {
+        countEl.textContent = visible + ' of ' + entries.length + ' terms';
+      }
+      updateCount(entries.length);
+
+      filterInput.addEventListener('input', function () {
+        var q = filterInput.value.trim().toLowerCase();
+        var visible = 0;
+        entries.forEach(function (e) {
+          var isMatch = !q || e.searchable.indexOf(q) !== -1;
+          e.el.classList.toggle('term-hidden', !isMatch);
+          if (isMatch) visible++;
+        });
+        updateCount(visible);
+      });
+
+      if (location.hash) {
+        var target = document.querySelector(location.hash);
+        if (target) target.scrollIntoView();
+      }
+    })();
+  </script>
+  </body>
+</html>
